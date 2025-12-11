@@ -20,6 +20,7 @@ fun CalculatorScreen() {
     var currentInput by remember { mutableStateOf("") }
     var operator by remember { mutableStateOf<String?>(null) }
     var previousInput by remember { mutableStateOf<String?>(null) }
+    var isResult by remember { mutableStateOf(false) }
 
     val df = DecimalFormat("#.##########")
 
@@ -28,14 +29,23 @@ fun CalculatorScreen() {
         currentInput = ""
         operator = null
         previousInput = null
+        isResult = false
     }
 
     fun onNumberClick(number: String) {
         if (display == "Error") {
             onClearClick()
         }
+        if (isResult) {
+            currentInput = ""
+            isResult = false
+        }
         currentInput += number
-        display = currentInput
+        if (previousInput != null && operator != null) {
+            display = "$previousInput $operator $currentInput"
+        } else {
+            display = currentInput
+        }
     }
 
     fun onEqualsClick() {
@@ -62,31 +72,45 @@ fun CalculatorScreen() {
                 previousInput = null
                 operator = null
             }
+            isResult = true
         }
     }
 
     fun onOperatorClick(op: String) {
-        if (currentInput.isNotEmpty()) {
+        if (currentInput.isNotEmpty() && currentInput != ".") {
+            isResult = false
             if (previousInput != null && operator != null) {
                 onEqualsClick()
-                previousInput = display
-                currentInput = ""
-                operator = op
+                if (display != "Error") {
+                    previousInput = display
+                    currentInput = ""
+                    operator = op
+                    display = "$previousInput $op"
+                }
             } else {
                 previousInput = currentInput
                 currentInput = ""
                 operator = op
-                display = previousInput ?: "0"
+                display = "$previousInput $op"
             }
         } else if (previousInput != null) {
             operator = op
+            display = "$previousInput $op"
         }
     }
 
     fun onDecimalClick() {
+        if (isResult) {
+            currentInput = "0"
+            isResult = false
+        }
         if (!currentInput.contains(".")) {
-            currentInput += "."
-            display = currentInput
+            currentInput += if (currentInput.isEmpty()) "0." else "."
+            if (previousInput != null && operator != null) {
+                display = "$previousInput $operator $currentInput"
+            } else {
+                display = currentInput
+            }
         }
     }
 

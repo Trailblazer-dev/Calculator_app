@@ -15,7 +15,7 @@ import com.example.addition.ui.theme.AdditionTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // enableEdgeToEdge()
         setContent {
             AdditionTheme {
                 Surface(
